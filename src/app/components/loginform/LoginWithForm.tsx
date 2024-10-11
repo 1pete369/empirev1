@@ -1,7 +1,6 @@
 "use client"
 
 import { useUser } from '@/app/contexts/UserProviderContext';
-import { FirebaseError } from 'firebase/app';
 import Link from 'next/link';
 import React, { useState } from 'react';
 
