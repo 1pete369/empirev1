@@ -1,5 +1,3 @@
-"use client";
-
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import {
   GoogleAuthProvider,
@@ -31,11 +29,6 @@ type FirebaseUserObject = {
     goals?: string[];
   };
 };
-
-// Define the error type
-interface AuthError extends FirebaseError {
-  message: string;
-}
 
 // Context to provide user data globally
 type UserContextType = {
@@ -75,9 +68,8 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       const firebaseUser = result.user;
       setUser(mapFirebaseUserToUserObject(firebaseUser));
       setError(null);
-    } catch (err) {
-      const error = err as AuthError; // Cast the error to the defined type
-      console.error("Google login error:", error); // Improved logging
+    } catch (err: unknown) {
+      console.error("Google login error:", err);
       setError('An unexpected error occurred during Google login.');
     }
   };
@@ -93,10 +85,13 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       const firebaseUser = result.user;
       setUser(mapFirebaseUserToUserObject(firebaseUser));
       setError(null);
-    } catch (err) {
-      const error = err as AuthError; // Cast the error to the defined type
-      console.error("Email login error:", error);
-      setError('Invalid email/password');
+    } catch (err: unknown) {
+      console.error("Email login error:", err);
+      if (err instanceof FirebaseError) {
+        setError('Invalid email/password');
+      } else {
+        setError('An unexpected error occurred. Please try again.');
+      }
     }
   };
 
@@ -126,16 +121,19 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
       setUser(mapFirebaseUserToUserObject(firebaseUser, username));
       setError(null);
-    } catch (err) {
-      const error = err as AuthError; // Cast the error to the defined type
-      console.error('Signup error:', error);
-      switch (error.code) {
-        case "auth/email-already-in-use":
-          setError("Email already exists!!");
-          break;
-        default:
-          setError(error.message || "Signup failed. Please try again.");
-          break;
+    } catch (err: unknown) {
+      console.error('Signup error:', err);
+      if (err instanceof FirebaseError) {
+        switch(err.code){
+          case "auth/email-already-in-use":
+            setError("Email already exists!");
+            break;
+          default:
+            setError(err.message || "Signup failed. Please try again.");
+            break;
+        }
+      } else {
+        setError("Signup failed. Please try again.");
       }
     }
   };
@@ -145,9 +143,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       await signOut(auth);
       setUser(null);
       setError(null);
-    } catch (err) {
-      const error = err as AuthError; // Cast the error to the defined type
-      console.error("Logout error:", error);
+    } catch (err: unknown) {
       setError("Logout failed. Please try again.");
     }
   };
