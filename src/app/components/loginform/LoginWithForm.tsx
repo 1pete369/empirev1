@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { useUser } from '@/app/contexts/UserProviderContext';
 import Link from 'next/link';
@@ -7,7 +7,7 @@ import React, { useState } from 'react';
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [isLoading, setIsLoading] = useState(false); // Loading state
+  const [isLoading, setIsLoading] = useState(false);
 
   const userContext = useUser();
 
@@ -15,35 +15,31 @@ export default function LoginPage() {
     return <div>Loading...</div>;
   }
 
-  const { handleEmailLogin, error } = userContext; // Make sure setError is accessible
+  const { handleEmailLogin, error } = userContext;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    console.log("Came to login");
 
     if (!email || !password) {
       alert('Please fill in both fields.');
       return;
     }
 
-    // Reset error on new attempt
-    setIsLoading(true); // Set loading state to true
+    setIsLoading(true);
 
     try {
       await handleEmailLogin(email, password);
-      console.log("Came after login");
     } catch (err) {
-      console.error("Login error:", err); // Log the error for debugging
-      // Here you can handle specific error messages if necessary
+      console.error("Login error:", err);
+      // Handle specific error messages if necessary
     } finally {
-      setIsLoading(false); // Reset loading state after the operation
+      setIsLoading(false);
     }
   };
 
   return (
     <form onSubmit={handleSubmit} className='p-4 flex flex-col gap-6 items-center shadow-md rounded-sm box-border'>
-      {error && <p className="text-red-500">{error}</p>} {/* Display error from context */}
+      {error && <p className="text-red-500">{error}</p>}
       <div className='flex gap-6 items-center justify-center'>
         <label htmlFor="email" className='hidden'>Email:</label>
         <input
@@ -71,11 +67,11 @@ export default function LoginPage() {
       <button 
         type='submit' 
         className='rounded-sm bg-sky-500 text-sky-100 px-2 py-1.5 flex-1 min-w-60'
-        disabled={isLoading} // Disable button when loading
+        disabled={isLoading}
       >
-        {isLoading ? 'Logging in...' : 'Login'} {/* Change button text on loading */}
+        {isLoading ? 'Logging in...' : 'Login'}
       </button>
-      <p>Don't have an account? <span className='text-sm text-sky-500 underline'><Link href={"/auth/register"}>SignUp</Link></span></p>
+      <p>Don&apos;t have an account? <span className='text-sm text-sky-500 underline'><Link href={"/auth/register"}>Sign Up</Link></span></p>
     </form>
   );
 }

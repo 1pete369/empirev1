@@ -32,6 +32,11 @@ type FirebaseUserObject = {
   };
 };
 
+// Define the error type
+interface AuthError extends FirebaseError {
+  message: string;
+}
+
 // Context to provide user data globally
 type UserContextType = {
   user: FirebaseUserObject | null;
@@ -70,16 +75,16 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       const firebaseUser = result.user;
       setUser(mapFirebaseUserToUserObject(firebaseUser));
       setError(null);
-    } catch (err: any) {
-      console.error("Google login error:", err); // Improved logging
+    } catch (err) {
+      const error = err as AuthError; // Cast the error to the defined type
+      console.error("Google login error:", error); // Improved logging
       setError('An unexpected error occurred during Google login.');
     }
   };
 
   const handleEmailLogin = async (email: string, password: string) => {
-    // Check if the password is less than 8 characters
     if (password.length < 8) {
-      setError('Password must be at least 8 characters long.'); // Correct error message
+      setError('Password must be at least 8 characters long.');
       return;
     }
 
@@ -88,13 +93,10 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       const firebaseUser = result.user;
       setUser(mapFirebaseUserToUserObject(firebaseUser));
       setError(null);
-    } catch (err: any) {
-      console.error("Email login error:", err); // Log the entire error object
-      if (err instanceof FirebaseError) {
-        setError('Invalid email/password');
-      } else {
-        setError('An unexpected error occurred. Please try again.');
-      }
+    } catch (err) {
+      const error = err as AuthError; // Cast the error to the defined type
+      console.error("Email login error:", error);
+      setError('Invalid email/password');
     }
   };
 
@@ -109,9 +111,8 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       return;
     }
 
-    // Check if the password is less than 8 characters
     if (password.length < 8) {
-      setError('Password must be at least 8 characters long.'); // Correct error message
+      setError('Password must be at least 8 characters long.');
       return;
     }
 
@@ -125,15 +126,17 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
       setUser(mapFirebaseUserToUserObject(firebaseUser, username));
       setError(null);
-    } catch (err: any) {
-      console.error('Signup error:', err);
-      switch(err.code){
-        case "auth/email-already-in-use": setError("Email already exists!!")
-                                          break
-        default : setError(err.message || "Signup failed. Please try again.");
-        break
+    } catch (err) {
+      const error = err as AuthError; // Cast the error to the defined type
+      console.error('Signup error:', error);
+      switch (error.code) {
+        case "auth/email-already-in-use":
+          setError("Email already exists!!");
+          break;
+        default:
+          setError(error.message || "Signup failed. Please try again.");
+          break;
       }
-      
     }
   };
 
@@ -142,7 +145,9 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       await signOut(auth);
       setUser(null);
       setError(null);
-    } catch (err: any) {
+    } catch (err) {
+      const error = err as AuthError; // Cast the error to the defined type
+      console.error("Logout error:", error);
       setError("Logout failed. Please try again.");
     }
   };
