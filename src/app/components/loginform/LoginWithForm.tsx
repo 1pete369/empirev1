@@ -10,16 +10,13 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
 
   const userContext = useUser();
-
-  if (!userContext) {
-    return <div>Loading...</div>;
-  }
-
-  const { handleEmailLogin, error , setError } = userContext;
+  const { handleEmailLogin, error, setError } = userContext || {};
 
   useEffect(() => {
-    setError(""); // Reset error when userContext is available
-  }, [userContext, setError]); 
+    if (userContext) {
+      setError(""); // Reset error when userContext is available
+    }
+  }, [userContext, setError]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,6 +37,10 @@ export default function LoginPage() {
       setIsLoading(false);
     }
   };
+
+  if (!userContext) {
+    return <div>Loading...</div>; // Render loading state while waiting for user context
+  }
 
   return (
     <form onSubmit={handleSubmit} className='p-4 flex flex-col gap-6 items-center shadow-md rounded-sm box-border'>

@@ -12,18 +12,14 @@ export default function RegisterPage() {
   const [isLoading, setIsLoading] = useState(false); // Loading state
   const userContext = useUser();
 
-  // Check if userContext is null
-  if (!userContext) {
-    return <div>Loading...</div>; // Handle null state appropriately
-  }
-
-  const { handleEmailSignup, error , setError} = userContext;
+  const { handleEmailSignup, error, setError } = userContext || {};
 
   useEffect(() => {
-    setError(""); // Reset error when userContext is available
-  }, [userContext, setError]); 
+    if (userContext) {
+      setError(""); // Reset error when userContext is available
+    }
+  }, [userContext, setError]);
 
-  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSuccess('');
@@ -40,17 +36,20 @@ export default function RegisterPage() {
       setSuccess('Registration successful! You can now log in.');
     } catch (err) {
       console.error('Registration error:', err); // Log the error for debugging
-      // You can handle specific error messages if necessary
     } finally {
       setIsLoading(false); // Reset loading state after the operation
     }
   };
 
+  if (!userContext) {
+    return <div>Loading...</div>; // Render loading state while waiting for user context
+  }
+
   return (
     <form onSubmit={handleSubmit} className='p-4 flex flex-col gap-6 items-center shadow-md rounded-sm box-border'>
       {error && <p className="text-red-500">{error}</p>} {/* Display error from context */}
-      {error===null && <p className="text-green-500">{success}</p>} {/* Display success message */}
-      
+      {error === null && <p className="text-green-500">{success}</p>} {/* Display success message */}
+
       <div className='flex gap-6 items-center justify-center'>
         <label htmlFor="email" className='hidden'>Email:</label>
         <input
