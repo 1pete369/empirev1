@@ -1,3 +1,6 @@
+// src/app/contexts/UserProviderContext.tsx
+"use client"; // This directive tells Next.js that this is a Client Component.
+
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import {
   GoogleAuthProvider,
@@ -9,7 +12,7 @@ import {
   updateProfile,
   User as FirebaseUser,
 } from "firebase/auth";
-import { auth } from '../firebase/config';
+import { auth } from '../firebase/config'; // Adjust the import path according to your project structure
 import { FirebaseError } from 'firebase/app';
 
 // Define the type for the unified user object
@@ -42,10 +45,11 @@ type UserContextType = {
 
 const UserContext = createContext<UserContextType | null>(null);
 
+// Function to map Firebase user to your user object
 const mapFirebaseUserToUserObject = (user: FirebaseUser, username?: string): FirebaseUserObject => {
   return {
     uid: user.uid,
-    email: user.email ?? '',
+    email: user.email || '',
     displayName: user.displayName || '',
     username: username || (user.displayName ? user.displayName.replace(/\s+/g, '') : ''),
     photoURL: user.photoURL || '',
@@ -57,7 +61,7 @@ const mapFirebaseUserToUserObject = (user: FirebaseUser, username?: string): Fir
   };
 };
 
-export const UserProvider = ({ children }: { children: React.ReactNode }) => {
+export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<FirebaseUserObject | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -68,7 +72,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       const firebaseUser = result.user;
       setUser(mapFirebaseUserToUserObject(firebaseUser));
       setError(null);
-    } catch (err: unknown) {
+    } catch (err) {
       console.error("Google login error:", err);
       setError('An unexpected error occurred during Google login.');
     }
@@ -85,7 +89,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       const firebaseUser = result.user;
       setUser(mapFirebaseUserToUserObject(firebaseUser));
       setError(null);
-    } catch (err: unknown) {
+    } catch (err) {
       console.error("Email login error:", err);
       if (err instanceof FirebaseError) {
         setError('Invalid email/password');
@@ -121,10 +125,10 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
       setUser(mapFirebaseUserToUserObject(firebaseUser, username));
       setError(null);
-    } catch (err: unknown) {
+    } catch (err) {
       console.error('Signup error:', err);
       if (err instanceof FirebaseError) {
-        switch(err.code){
+        switch (err.code) {
           case "auth/email-already-in-use":
             setError("Email already exists!");
             break;
@@ -143,7 +147,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       await signOut(auth);
       setUser(null);
       setError(null);
-    } catch (err: unknown) {
+    } catch (err) {
       setError("Logout failed. Please try again.");
     }
   };
@@ -175,4 +179,11 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-export const useUser = () => useContext(UserContext);
+// Custom hook to use the User context
+export const useUser = () => {
+  const context = useContext(UserContext);
+  if (context === null) {
+    throw new Error("useUser must be used within a UserProvider");
+  }
+  return context;
+};
