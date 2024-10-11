@@ -3,11 +3,10 @@
 import React, { useEffect, useState } from "react";
 import { auth } from "../../firebase/config";
 import { GoogleAuthProvider, onAuthStateChanged, signInWithPopup, signOut, User } from "firebase/auth";
-import Image from 'next/image'; // Import Next.js Image component
+import Image from 'next/image';
 
-// Rename 'page' to 'LoginPage' or another suitable name starting with an uppercase letter
 export default function LoginPage() {
-  const [user, setUser] = useState<User | null>(null); // Initialize with null
+  const [user, setUser] = useState<User | null>(null);
 
   const handleLogin = async () => {
     try {
@@ -21,14 +20,14 @@ export default function LoginPage() {
   const handleLogout = async () => {
     try {
       await signOut(auth);
-      setUser(null); // Reset user state on logout
+      setUser(null);
     } catch (err) {
       alert(err);
     }
   };
 
   useEffect(() => {
-    let isSubscribed = true; // Prevent side effects after unmount
+    let isSubscribed = true;
 
     onAuthStateChanged(auth, (currentUser) => {
       if (isSubscribed) {
@@ -42,41 +41,42 @@ export default function LoginPage() {
   }, []);
 
   return (
-    <div className="h-screen grid content-center bg-stone-50 p-4">
-      {user ? (
-        <button
-          className="mx-auto bg-slate-800 max-w-[200px] p-2.5 rounded text-white text-lg text-center shadow-md"
-          onClick={handleLogout}
-        >
-          Logout
-        </button>
-      ) : (
-        <button
-          className="mx-auto bg-slate-800 max-w-[200px] p-2.5 rounded text-white text-lg text-center shadow-md"
-          onClick={handleLogin}
-        >
-          Continue with Google
-        </button>
-      )}
-      <div className="mt-10">
-        {user === null ? (
-          <h1>Loading...</h1>
+    <div className="flex items-center justify-center min-h-[calc(100vh-60px)] bg-stone-50 p-4">
+      {/* Subtract the navbar height from the screen */}
+      <div className="text-center">
+        {user ? (
+          <button
+            className="mx-auto bg-slate-800 max-w-[200px] p-2.5 rounded text-white text-lg text-center shadow-md"
+            onClick={handleLogout}
+          >
+            Logout
+          </button>
         ) : (
-          <div>
-            <h2>User Details</h2>
-            <p>UserName: {user?.displayName}</p>
-            <p>Email: {user?.email}</p>
-            {user?.photoURL && (
-              <Image
-                src={user.photoURL}
-                width={40}
-                height={40}
-                className="rounded"
-                alt="User profile picture"
-              />
-            )}
-          </div>
+          <button
+            className="mx-auto bg-slate-800 max-w-[200px] p-2.5 rounded text-white text-lg text-center shadow-md"
+            onClick={handleLogin}
+          >
+            Continue with Google
+          </button>
         )}
+        <div className="mt-10">
+          {user !== null && (
+            <div>
+              <h2>User Details</h2>
+              <p>UserName: {user?.displayName}</p>
+              <p>Email: {user?.email}</p>
+              {user?.photoURL && (
+                <Image
+                  src={user.photoURL}
+                  width={40}
+                  height={40}
+                  className="rounded"
+                  alt="User profile picture"
+                />
+              )}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
