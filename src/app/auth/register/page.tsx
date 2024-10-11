@@ -6,7 +6,7 @@ import RegisterWithGoogle from "../../components/registerform/RegisterWithGoogle
 import RegisterWithForm from "../../components/registerform/RegisterWithForm";
 import { useUser } from "@/app/contexts/UserProviderContext";
 
-export default function LoginPage() {
+export default function RegisterPage() {
   const { push } = useRouter(); // Initialize useRouter
   const userContext = useUser();
 
