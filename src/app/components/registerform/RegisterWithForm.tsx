@@ -1,7 +1,7 @@
 "use client"
 
 import Link from 'next/link';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useUser } from '@/app/contexts/UserProviderContext';
 
 export default function RegisterPage() {
@@ -17,7 +17,11 @@ export default function RegisterPage() {
     return <div>Loading...</div>; // Handle null state appropriately
   }
 
-  const { handleEmailSignup, error } = userContext;
+  const { handleEmailSignup, error , setError} = userContext;
+
+  useEffect(()=>{
+    setError("")
+  },[])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

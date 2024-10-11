@@ -2,7 +2,7 @@
 
 import { useUser } from '@/app/contexts/UserProviderContext';
 import Link from 'next/link';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -15,7 +15,11 @@ export default function LoginPage() {
     return <div>Loading...</div>;
   }
 
-  const { handleEmailLogin, error } = userContext;
+  const { handleEmailLogin, error , setError } = userContext;
+
+  useEffect(()=>{
+    setError("")
+  },[])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

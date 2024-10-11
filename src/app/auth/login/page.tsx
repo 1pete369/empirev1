@@ -20,7 +20,6 @@ export default function LoginPage() {
       redirect('/profile'); // Redirect if the user is logged in
     }
   }, [user]);
-
   // Show loading state until userContext is available
   if (isLoading) {
     return <div>Loading...</div>; // or handle the null state appropriately

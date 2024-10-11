@@ -37,6 +37,7 @@ type FirebaseUserObject = {
 type UserContextType = {
   user: FirebaseUserObject | null;
   error: string | null;
+  setError : React.Dispatch<React.SetStateAction<string | null>>
   handleGoogleLogin: () => Promise<void>;
   handleEmailLogin: (email: string, password: string) => Promise<void>;
   handleEmailSignup: (email: string, password: string, username: string) => Promise<void>;
@@ -177,6 +178,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       handleEmailLogin,
       handleEmailSignup,
       handleLogout,
+      setError
     }}>
       {children}
     </UserContext.Provider>
