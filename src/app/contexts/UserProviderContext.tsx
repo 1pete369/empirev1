@@ -93,6 +93,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.error("Email login error:", err);
       if (err instanceof FirebaseError) {
         setError('Invalid email/password');
+        console.log(err.message)
       } else {
         setError('An unexpected error occurred. Please try again.');
       }
@@ -147,8 +148,11 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       await signOut(auth);
       setUser(null);
       setError(null);
-    } catch (err) {
-      setError("Logout failed. Please try again.");
+    } catch (err ) {
+      if(err instanceof FirebaseError){
+        setError("Logout failed. Please try again.");
+        console.log(err.message)
+      }
     }
   };
 
