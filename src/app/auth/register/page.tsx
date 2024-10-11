@@ -10,18 +10,22 @@ export default function RegisterPage() {
   const { push } = useRouter(); // Initialize useRouter
   const userContext = useUser();
 
-  // Check if userContext is null
-  if (!userContext) {
-    return <div>Loading...</div>; // Handle null state appropriately
-  }
+  // Instead of returning early, we can use a loading state to render the loading message
+  const isLoading = !userContext;
 
-  const { user } = userContext;
+  // Destructure user safely
+  const { user } = userContext || {}; 
 
   useEffect(() => {
     if (user !== null) {
       push('/profile'); // Use router push to redirect client-side
     }
   }, [user, push]);
+
+  // Show loading state until userContext is available
+  if (isLoading) {
+    return <div>Loading...</div>; // Handle null state appropriately
+  }
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[calc(100vh-60px)] bg-stone-50 p-4 gap-5">
