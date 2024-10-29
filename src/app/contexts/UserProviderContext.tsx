@@ -54,7 +54,7 @@ const mapFirebaseUserToUserObject = (user: FirebaseUser, username?: string): Fir
     email: user.email || '',
     displayName: user.displayName || '',
     username: username || (user.displayName ? user.displayName.replace(/\s+/g, '') : ''),
-    photoURL: user.photoURL || 'https://picsum.photos/200',
+    photoURL: user.photoURL || 'https://source.unsplash.com/random/200x200',
     provider: user.providerData[0]?.providerId === 'google.com' ? 'google' : 'email',
     isEmailVerified: user.emailVerified,
     createdAt: new Date(user.metadata.creationTime || ''),
