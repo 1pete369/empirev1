@@ -5,7 +5,7 @@ import axios from 'axios'
 import Image from 'next/image'
 import React, { useEffect, useState } from 'react'
 
-export default function page() {
+export default function AdminPage() {
 
     const [users, setUsers] = useState<FirebaseUserObject[] | []>([])
 
