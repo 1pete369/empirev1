@@ -14,9 +14,10 @@ import {
 } from "firebase/auth";
 import { auth } from '../firebase/config'; // Adjust the import path according to your project structure
 import { FirebaseError } from 'firebase/app';
+import { IsUserExist } from '../functions/IsUserExists'; // Ensure this is correctly imported
 
 // Define the type for the unified user object
-type FirebaseUserObject = {
+export type FirebaseUserObject = {
   uid: string;
   email: string;
   displayName?: string;
@@ -37,7 +38,7 @@ type FirebaseUserObject = {
 type UserContextType = {
   user: FirebaseUserObject | null;
   error: string | null;
-  setError : React.Dispatch<React.SetStateAction<string | null>>
+  setError: React.Dispatch<React.SetStateAction<string | null>>;
   handleGoogleLogin: () => Promise<void>;
   handleEmailLogin: (email: string, password: string) => Promise<void>;
   handleEmailSignup: (email: string, password: string, username: string) => Promise<void>;
@@ -53,12 +54,14 @@ const mapFirebaseUserToUserObject = (user: FirebaseUser, username?: string): Fir
     email: user.email || '',
     displayName: user.displayName || '',
     username: username || (user.displayName ? user.displayName.replace(/\s+/g, '') : ''),
-    photoURL: user.photoURL || '',
+    photoURL: user.photoURL || 'https://picsum.photos/200',
     provider: user.providerData[0]?.providerId === 'google.com' ? 'google' : 'email',
     isEmailVerified: user.emailVerified,
     createdAt: new Date(user.metadata.creationTime || ''),
     lastLoginAt: new Date(user.metadata.lastSignInTime || ''),
-    customData: {},
+    customData: {
+      streak: 0,
+    },
   };
 };
 
@@ -94,7 +97,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.error("Email login error:", err);
       if (err instanceof FirebaseError) {
         setError('Invalid email/password');
-        console.log(err.message)
+        console.log(err.message);
       } else {
         setError('An unexpected error occurred. Please try again.');
       }
@@ -124,7 +127,6 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       await updateProfile(firebaseUser, {
         displayName: username,
       });
-
       setUser(mapFirebaseUserToUserObject(firebaseUser, username));
       setError(null);
     } catch (err) {
@@ -144,15 +146,23 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  useEffect(() => {
+    if (user !== null) {
+      console.log("User state updated:", user);
+      IsUserExist(user)
+    }
+
+  }, [user]); // Dependency on `user`
+
   const handleLogout = async () => {
     try {
       await signOut(auth);
       setUser(null);
       setError(null);
-    } catch (err ) {
-      if(err instanceof FirebaseError){
+    } catch (err) {
+      if (err instanceof FirebaseError) {
         setError("Logout failed. Please try again.");
-        console.log(err.message)
+        console.log(err.message);
       }
     }
   };
@@ -166,7 +176,6 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUser(null);
       }
     });
-
     return () => unsubscribe();
   }, []);
 
@@ -178,7 +187,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       handleEmailLogin,
       handleEmailSignup,
       handleLogout,
-      setError
+      setError,
     }}>
       {children}
     </UserContext.Provider>

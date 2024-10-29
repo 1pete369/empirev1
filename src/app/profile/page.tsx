@@ -3,6 +3,7 @@
 import React from "react";
 import { useUser } from "../contexts/UserProviderContext";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Page() {
   const userContext = useUser();
@@ -29,11 +30,21 @@ export default function Page() {
             <p>CreatedAt: {user?.createdAt?.toLocaleDateString()}</p>
             <p>LastLoginAt: {user?.lastLoginAt?.toLocaleDateString()}</p>
             <button
-              className="bg-slate-800 p-2.5 max-w-[200px] rounded text-white text-lg text-center shadow-md"
+              className="bg-slate-800 p-2.5 min-w-[200px] max-w-[200px] rounded text-white text-lg text-center shadow-md"
               onClick={handleLogout}
             >
               Logout
             </button>
+            {
+              user.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL &&
+              <Link href={'/admin/dashboard'}>
+              <button
+              className="bg-teal-500 p-2.5 min-w-[200px] max-w-[200px] rounded text-white text-lg text-center shadow-md"
+              >
+              Dashboard
+            </button>
+            </Link>
+            }
           </div>
           <div>
             {user?.photoURL && (

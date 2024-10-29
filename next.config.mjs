@@ -8,6 +8,7 @@ const nextConfig = {
           pathname: '/**', // Define the path (wildcard to allow any image from the domain)
         },
       ],
+     domains: ['picsum.photos'],
     },
   };
   

@@ -14,11 +14,11 @@ export default function RegisterPage() {
 
   const { handleEmailSignup, error, setError } = userContext || {};
 
-  useEffect(() => {
-    if (userContext) {
-      setError(""); // Reset error when userContext is available
-    }
-  }, [userContext, setError]);
+  // useEffect(() => {
+  //   if (userContext) {
+  //     setError(""); // Reset error when userContext is available
+  //   }
+  // }, [userContext, setError]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
